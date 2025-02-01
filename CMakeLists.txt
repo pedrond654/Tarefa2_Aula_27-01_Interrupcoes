@@ -28,35 +28,35 @@ set(PICO_BOARD pico_w CACHE STRING "Board type")
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
 
-project(interrupts C CXX ASM)
+project(Interrupcao C CXX ASM)
 
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(interrupts interrupts.c )
+add_executable(Interrupcao Interrupcao.c )
 
-pico_set_program_name(interrupts "interrupts")
-pico_set_program_version(interrupts "0.1")
+pico_set_program_name(Interrupcao "Interrupcao")
+pico_set_program_version(Interrupcao "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
-pico_enable_stdio_uart(interrupts 1)
-pico_enable_stdio_usb(interrupts 1)
+pico_enable_stdio_uart(Interrupcao 0)
+pico_enable_stdio_usb(Interrupcao 0)
 
 # Add the standard library to the build
-target_link_libraries(interrupts
+target_link_libraries(Interrupcao
         pico_stdlib)
 
 # Add the standard include files to the build
-target_include_directories(interrupts PRIVATE
+target_include_directories(Interrupcao PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
 
 # Add any user requested libraries
-target_link_libraries(interrupts 
+target_link_libraries(Interrupcao 
         
         )
 
-pico_add_extra_outputs(interrupts)
+pico_add_extra_outputs(Interrupcao)
 

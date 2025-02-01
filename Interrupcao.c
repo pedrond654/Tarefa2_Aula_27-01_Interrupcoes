@@ -20,7 +20,7 @@ int main()
     gpio_set_dir(red,GPIO_OUT);
 
     gpio_init(green);
-    gpio_set_dir(greeb,GPIO_OUT);
+    gpio_set_dir(green,GPIO_OUT);
 
     gpio_init(blue);
     gpio_set_dir(blue,GPIO_OUT);
@@ -33,5 +33,17 @@ int main()
     gpio_set_dir(bt_B, GPIO_IN);
     gpio_pull_up(bt_B);  
 
+    while (true)
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            gpio_put(red, true);
+            sleep_ms(100);
+
+            gpio_put(red, false);
+            sleep_ms(100);
+        }
+    }
+    
 return 0;
 }
