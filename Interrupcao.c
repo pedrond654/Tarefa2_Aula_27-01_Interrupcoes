@@ -326,10 +326,10 @@ int main()
     gpio_pull_up(bt_B);  
 
 
-    // interrupção por borda de descida
-    // Configura apenas uma vez o callback
+    // interrupção por borda de descida e Configuração do Callback
     gpio_set_irq_enabled_with_callback(bt_A, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
-    // Para o segundo botão, use gpio_set_irq_enabled
+
+    // Para o segundo botão:
     gpio_set_irq_enabled(bt_B, GPIO_IRQ_EDGE_FALL, true);
 
     while (true)
