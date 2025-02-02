@@ -5,16 +5,15 @@
 #include "hardware/pio.h"
 
 //Mapeamento
-#define red 13
-#define bt_A 5
-#define bt_B 6
+const uint red = 13;
+const uint bt_A = 5;
+const uint bt_B = 6;
 
 // Definição do número de LEDs e pino.
 #define LED_COUNT 25
 #define LED_PIN 7
 
-static volatile uint32_t last_time_A = 0; // Tempo da última interrupção do botão A
-static volatile uint32_t last_time_B = 0; // Tempo da última interrupção do botão B
+static volatile uint32_t last_time = 0; // variável auxiliar 
 static volatile uint flag = 0;
 
 // Definição de pixel GRB (Matriz de Leds)
@@ -96,6 +95,7 @@ int getIndex(int x, int y) {
 void leds_numeros()
 {
     npClear();
+    sleep_ms(100);
 
     switch (flag)
     {
@@ -274,10 +274,33 @@ void leds_numeros()
 }
 
 
+void gpio_callback(uint gpio, uint32_t events) {
+    uint32_t current_time = to_us_since_boot(get_absolute_time());
 
-// Prototipação da função de interrupção
-static void crescer_numero(uint gpio, uint32_t events);
-static void diminuir_numero(uint gpio, uint32_t events);
+    if (current_time - last_time > 200000) // 200 ms de debounce
+    {
+        last_time = current_time;
+
+        if (gpio == bt_A) {
+            // Botão A - incrementar
+            if(flag == 9) { 
+                flag = 0; 
+            } else { 
+                flag = flag + 1; 
+            }
+            printf("Botão A pressionado. Flag: %d\n", flag);
+        }
+        else if (gpio == bt_B) {
+            // Botão B - decrementar
+            if(flag == 0) { 
+                flag = 9; 
+            } else { 
+                flag = flag - 1; 
+            }
+            printf("Botão B pressionado. Flag: %d\n", flag);
+        }
+    }
+}
 
 int main()
 {
@@ -304,8 +327,10 @@ int main()
 
 
     // interrupção por borda de descida
-    gpio_set_irq_enabled_with_callback(bt_B, GPIO_IRQ_EDGE_FALL, true, &diminuir_numero);
-    gpio_set_irq_enabled_with_callback(bt_A, GPIO_IRQ_EDGE_FALL, true, &crescer_numero);
+    // Configura apenas uma vez o callback
+    gpio_set_irq_enabled_with_callback(bt_A, GPIO_IRQ_EDGE_FALL, true, &gpio_callback);
+    // Para o segundo botão, use gpio_set_irq_enabled
+    gpio_set_irq_enabled(bt_B, GPIO_IRQ_EDGE_FALL, true);
 
     while (true)
     {
@@ -325,31 +350,4 @@ int main()
     }
     
 return 0;
-}
-
-// Funções de interrupção
-void crescer_numero(uint gpio, uint32_t events) {
-  uint32_t current_time = to_us_since_boot(get_absolute_time());
-  if (current_time - last_time_A > 200000) { // 200 ms de debounce para A
-    last_time_A = current_time;
-    if (flag == 9) {
-      flag = 0;
-    } else {
-      flag++;
-    }
-    printf("Botão A pressionado. Flag: %d\n", flag);
-  }
-}
-
-void diminuir_numero(uint gpio, uint32_t events) {
-  uint32_t current_time = to_us_since_boot(get_absolute_time());
-  if (current_time - last_time_B > 200000) { // 200 ms de debounce para B
-    last_time_B = current_time;
-    if (flag == 0) {
-      flag = 9;
-    } else {
-      flag--;
-    }
-    printf("Botão B pressionado. Flag: %d\n", flag);
-  }
 }
